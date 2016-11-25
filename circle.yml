@@ -4,5 +4,7 @@ machine:
       2.3.1
 test:
   post:
+    - cp -r coverage "$CIRCLE_ARTIFACTS/coverage"
+    - cp -r test/reports "$CIRCLE_TEST_REPORTS/test"
     - bundle exec codeclimate-test-reporter
 
