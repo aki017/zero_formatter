@@ -44,7 +44,7 @@ module ZeroFormatter
 
         v = value.send(field[:name])
         if field[:options][:nullable]
-          data << Utils.write_byte(v.nil? ? 0 : 1)
+          data << Utils.write_u1(v.nil? ? 0 : 1)
         end
 
         data << get_serializer(field[:type]).serialize(v)
@@ -54,7 +54,7 @@ module ZeroFormatter
         data_header << Utils.write_s4(h || -1)
       end
 
-      data_size = header_size + data.size
+      data_size = header_size + data.bytesize
 
       response = "".force_encoding("ASCII-8bit")
       response << Utils.write_s4(data_size)
@@ -78,7 +78,7 @@ module ZeroFormatter
         index = field[:index]
         offset = Utils.read_s4(bytes, 8+4*index)
         if field[:options][:nullable]
-          if Utils.read_byte(bytes, offset) == 0
+          if Utils.read_u1(bytes, offset) == 0
             result.send("#{field[:name]}=", nil)
             next
           end

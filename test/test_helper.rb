@@ -2,6 +2,7 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'zero_formatter'
 
 require 'minitest/autorun'
+require 'minitest/pride'
 
 def fixture(path)
   File.read(File.expand_path("../fixture/#{path}", __FILE__))

@@ -4,11 +4,11 @@ module ZeroFormatter
       extend self
       Alias = %i(sbyte int8 int_8)
       def serialize(value)
-        Utils.write_byte(value)
+        Utils.write_s1(value)
       end
 
       def deserialize(bytes, offset=0)
-        Utils.read_byte(bytes, offset)
+        Utils.read_s1(bytes, offset)
       end
     end
 

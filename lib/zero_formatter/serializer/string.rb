@@ -6,14 +6,11 @@ module ZeroFormatter
       def serialize(value)
         bytesize = (value || "").bytesize
         result = value || ""
-        result = result.dup
-        (2-bytesize).times{ result << 0 }
-        result
+        (result.encode("utf-16le").bytes + [0, 0]).pack("CC")
       end
 
       def deserialize(bytes, offset=0)
-        is_multibyte = Utils.read_byte(bytes, offset+1) != 0
-        bytes.byteslice(offset, is_multibyte ? 2 : 1).force_encoding("utf-8")
+        bytes.byteslice(offset, 2).force_encoding("utf-16le").encode(__ENCODING__)
       end
     end
 
@@ -21,6 +18,8 @@ module ZeroFormatter
       extend self
       Alias = %i(string str)
       def serialize(value)
+        value ||= ""
+
         Utils.write_s4(value.bytesize) << value
       end
 

@@ -1,6 +1,14 @@
 module ZeroFormatter
   class Utils
     class << self
+      def read_s1(bytes, index)
+        to_signed(bytes.getbyte(index), 1 << (8 -1))
+      end
+
+      def read_u1(bytes, index)
+        bytes.getbyte(index)
+      end
+
       def read_u2(bytes, index)
         bytes.byteslice(index, 2).unpack('v')[0]
       end
@@ -34,15 +42,22 @@ module ZeroFormatter
         bytes.byteslice(index, 8).unpack('E')[0]
       end
 
-      def read_byte(bytes, index)
-        bytes.getbyte(index)
-      end
-
       def to_signed(v, mask)
         (v & ~mask) - (v & mask)
       end
 
 
+
+
+      def write_u1(value)
+        value ||= 0
+        [value].pack("C")
+      end
+
+      def write_s1(value)
+        value ||= 0
+        [value].pack("c")
+      end
 
       def write_u2(value)
         value ||= 0
@@ -83,11 +98,6 @@ module ZeroFormatter
       def write_d8(value)
         value ||= 0.0
         [value].pack("E")
-      end
-
-      def write_byte(value)
-        value ||= 0
-        "".force_encoding("ASCII-8bit") << value
       end
     end
   end
