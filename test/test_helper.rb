@@ -1,3 +1,14 @@
+require 'simplecov'
+
+if ENV['CIRCLE_ARTIFACTS']
+  dir = File.join(ENV['CIRCLE_ARTIFACTS'], 'coverage')
+  SimpleCov.coverage_dir(dir)
+end
+
+SimpleCov.start do
+  add_filter '/test/'
+end
+
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'zero_formatter'
 
