@@ -13,7 +13,12 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'zero_formatter'
 
 require "minitest/reporters"
-Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter  .new, Minitest::Reporters::JUnitReporter.new]
+if ENV["CIRCLE_TEST_REPORTS"]
+  report_path = File.join(ENV["CIRCLE_TEST_REPORTS"], "test")
+else
+  report_path = "test/reports"
+end
+Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new, Minitest::Reporters::JUnitReporter.new(report_path)]
 require 'minitest/autorun'
 require 'minitest/pride'
 
