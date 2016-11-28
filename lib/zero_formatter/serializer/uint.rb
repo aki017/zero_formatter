@@ -7,7 +7,7 @@ module ZeroFormatter
         Utils.write_u1(value)
       end
 
-      def deserialize(bytes, offset=0)
+      def deserialize(bytes, offset=0, options={})
         Utils.read_u1(bytes, offset)
       end
     end
@@ -19,7 +19,7 @@ module ZeroFormatter
         Utils.write_u2(value)
       end
 
-      def deserialize(bytes, offset=0)
+      def deserialize(bytes, offset=0, options={})
         Utils.read_u2(bytes, offset)
       end
     end
@@ -31,7 +31,7 @@ module ZeroFormatter
         Utils.write_u4(value)
       end
 
-      def deserialize(bytes, offset=0)
+      def deserialize(bytes, offset=0, options={})
         Utils.read_u4(bytes, offset)
       end
     end
@@ -43,7 +43,7 @@ module ZeroFormatter
         Utils.write_u8(value)
       end
 
-      def deserialize(bytes, offset=0)
+      def deserialize(bytes, offset=0, options={})
         Utils.read_u8(bytes, offset)
       end
     end

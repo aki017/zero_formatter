@@ -1,23 +1,16 @@
 module ZeroFormatter
-  module Serializer
-    class ObjectSerializer
-      def initialize(klass)
-        @klass = klass
-      end
-
+  class Serializer
+    module ObjectSerializer
+      extend self
+      Alias = %i(object)
       def serialize(value)
-        ZeroFormatter.dump(klass, bytes)
+        ZeroFormatter.dump(value)
       end
 
-      def deserialize(bytes)
-        ZeroFormatter.parse(klass, bytes)
-        object_size = read_s4(bytes, 0)
-        raise "Object size missmatch, expected=#{object_size}, actual=#{bytes.bytesize}" if object_size != bytes.bytesize
-
-        field_num = read_s4(bytes, 4)
-        raise "Field count is negative, #{field_num}" if field_num < 0
-
-        field_map = 
+      def deserialize(bytes, offset=0, options={})
+        object_size = Utils.read_s4(bytes, offset)
+        raise "#{options[:type]} is not ZeroFormattable" unless options[:type].include? ZeroFormatter::ZeroFormattable
+        ZeroFormatter.load(options[:type], bytes.byteslice(offset, object_size))
       end
     end
   end

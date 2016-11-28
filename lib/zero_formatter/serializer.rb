@@ -4,6 +4,7 @@ require "zero_formatter/serializer/fp"
 require "zero_formatter/serializer/bool"
 require "zero_formatter/serializer/string"
 require "zero_formatter/serializer/time"
+require "zero_formatter/serializer/object"
 
 module ZeroFormatter
   class Serializer
@@ -29,6 +30,8 @@ module ZeroFormatter
       add_implement TimeSpanSerializer
       add_implement TimeSerializer
       add_implement TimeWithOffsetSerializer
+
+      add_implement ObjectSerializer
     end
 
     def dump(value)
@@ -85,12 +88,13 @@ module ZeroFormatter
           offset += 1
         end
 
-        value = get_serializer(field[:type]).deserialize(bytes, offset)
+        value = get_serializer(field[:type]).deserialize(bytes, offset, field)
         
         result.send("#{field[:name]}=", value)
       end
       result
     end
+
     private
     def add_implement(klass)
       @implements ||= []
@@ -99,7 +103,15 @@ module ZeroFormatter
     end
 
     def get_serializer(type)
-      @type_table[type] || raise("Unknown type #{type}")
+      if @type_table[type]
+        return @type_table[type]
+      end
+
+      if type.include? ZeroFormattable
+        return @type_table[:object]
+      end
+
+      raise "Unknown type: #{type}"
     end
 
     def gen_type_table

@@ -9,7 +9,7 @@ module ZeroFormatter
         (result.encode("utf-16le").bytes + [0, 0]).pack("CC")
       end
 
-      def deserialize(bytes, offset=0)
+      def deserialize(bytes, offset=0, options={})
         bytes.byteslice(offset, 2).force_encoding("utf-16le").encode(__ENCODING__)
       end
     end
@@ -23,7 +23,7 @@ module ZeroFormatter
         Utils.write_s4(value.bytesize) << value
       end
 
-      def deserialize(bytes, offset=0)
+      def deserialize(bytes, offset=0, options={})
         len = Utils.read_s4(bytes, offset)
         bytes.byteslice(offset+4, len)
       end

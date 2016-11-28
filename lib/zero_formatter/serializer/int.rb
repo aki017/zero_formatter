@@ -7,7 +7,7 @@ module ZeroFormatter
         Utils.write_s1(value)
       end
 
-      def deserialize(bytes, offset=0)
+      def deserialize(bytes, offset=0, options={})
         Utils.read_s1(bytes, offset)
       end
     end
@@ -19,7 +19,7 @@ module ZeroFormatter
         Utils.write_s2(value)
       end
 
-      def deserialize(bytes, offset=0)
+      def deserialize(bytes, offset=0, options={})
         Utils.read_s2(bytes, offset)
       end
     end
@@ -31,7 +31,7 @@ module ZeroFormatter
         Utils.write_s4(value)
       end
 
-      def deserialize(bytes, offset=0)
+      def deserialize(bytes, offset=0, options={})
         Utils.read_s4(bytes, offset)
       end
     end
@@ -43,7 +43,7 @@ module ZeroFormatter
         Utils.write_s8(value)
       end
 
-      def deserialize(bytes, offset=0)
+      def deserialize(bytes, offset=0, options={})
         Utils.read_s8(bytes, offset)
       end
     end
