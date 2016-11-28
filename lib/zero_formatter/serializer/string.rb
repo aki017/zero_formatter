@@ -3,6 +3,11 @@ module ZeroFormatter
     module CharSerializer
       extend self
       Alias = %i(char)
+
+      def bytesize
+        2
+      end
+
       def serialize(value)
         bytesize = (value || "").bytesize
         result = value || ""
@@ -17,6 +22,11 @@ module ZeroFormatter
     module StringSerializer
       extend self
       Alias = %i(string str)
+
+      def bytesize
+        -1
+      end
+
       def serialize(value)
         value ||= ""
 

@@ -3,6 +3,11 @@ module ZeroFormatter
     module FloatSerializer
       extend self
       Alias = %i(single float)
+
+      def bytesize
+        4
+      end
+
       def serialize(value)
         Utils.write_f4(value)
       end
@@ -15,6 +20,11 @@ module ZeroFormatter
     module DoubleSerializer
       extend self
       Alias = %i(double)
+
+      def bytesize
+        8
+      end
+
       def serialize(value)
         Utils.write_d8(value)
       end

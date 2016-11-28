@@ -46,11 +46,65 @@ module ZeroFormatter
         data_headers[field[:index]] = header_size + data.bytesize
 
         v = value.send(field[:name])
+
         if field[:options][:nullable]
+          # nullable
+          #
+          # [hasValue:bool(1)]
+          # [T]
+          #
           data << Utils.write_u1(v.nil? ? 0 : 1)
         end
 
-        data << get_serializer(field[:type]).serialize(v)
+        if field[:options][:array]
+          serializer = get_serializer(field[:type])
+          bytesize = serializer.bytesize
+
+          if bytesize >= 0
+            # fixed-length format
+            #
+            #	[length:int(4)]
+            #	[elements:T...]
+            #
+            if v.nil?
+              data << Utils.write_s4(-1)
+              next
+            end
+
+            data << Utils.write_s4(v.size)
+
+            v.each do |vv|
+              data << serializer.serialize(vv)
+            end
+          else
+            # variable-length format
+            #
+            # [byteSize:int(4)]
+            # [length:int(4)]
+            # [elementOffset...:int(4 * length)]
+            # [elements:T...]
+            #
+            offsets = ""
+            elements = ""
+            
+            if v.nil?
+              bytesize = 8
+              length = -1
+            else
+              length = v.size
+              v.each do |vv|
+                offsets << Utils.write_s4(8+v.size*4+elements.size)
+                elements << get_serializer(field[:type]).serialize(vv)
+              end
+            end
+            data << Utils.write_s4(8+offsets.bytesize+elements.bytesize)
+            data << Utils.write_s4(length)
+            data << offsets
+            data << elements
+          end
+        else
+          data << get_serializer(field[:type]).serialize(v)
+        end
       end
 
       data_headers.each do |h|
@@ -80,7 +134,13 @@ module ZeroFormatter
       klass.fields.each do |field|
         index = field[:index]
         offset = Utils.read_s4(bytes, 8+4*index)
+
         if field[:options][:nullable]
+          # nullable
+          #
+          # [hasValue:bool(1)]
+          # [T]
+          #
           if Utils.read_u1(bytes, offset) == 0
             result.send("#{field[:name]}=", nil)
             next
@@ -88,7 +148,44 @@ module ZeroFormatter
           offset += 1
         end
 
-        value = get_serializer(field[:type]).deserialize(bytes, offset, field)
+        if field[:options][:array]
+          serializer = get_serializer(field[:type])
+          bytesize = serializer.bytesize
+
+          if bytesize >= 0
+            # fixed-length format
+            #
+            #	[length:int(4)]
+            #	[elements:T...]
+            #
+            obj_count = Utils.read_s4(bytes, offset)
+            if obj_count == -1
+              value = nil
+            else
+              value = (0..(obj_count-1)).map{|i|
+                serializer.deserialize(bytes, offset+4+i*bytesize, field)
+              }
+            end
+          else
+            # variable-length format
+            #
+            # [byteSize:int(4)]
+            # [length:int(4)]
+            # [elementOffset...:int(4 * length)]
+            # [elements:T...]
+            #
+            elements_length = Utils.read_s4(bytes, offset + 4)
+
+            if elements_length == -1
+              value = nil
+            else
+              elements_offsets = elements_length.times.map{|i| Utils.read_s4(bytes, offset + 8 + 4 * i)}
+              value = elements_offsets.map{|o| serializer.deserialize(bytes, offset+o) }
+            end
+          end
+        else
+          value = get_serializer(field[:type]).deserialize(bytes, offset, field)
+        end
         
         result.send("#{field[:name]}=", value)
       end

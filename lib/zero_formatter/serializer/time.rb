@@ -3,6 +3,11 @@ module ZeroFormatter
     module TimeSpanSerializer
       extend self
       Alias = %i(timespan duration)
+
+      def bytesize
+        12
+      end
+
       def serialize(value)
         value ||= { seconds: 0, nanos: 0 }
         Utils.write_s8(value[:seconds]) + Utils.write_s4(value[:nanos])
@@ -19,6 +24,11 @@ module ZeroFormatter
     module TimeSerializer
       extend self
       Alias = %i(datetime time)
+
+      def bytesize
+        12
+      end
+
       def serialize(value)
         value ||= Time.at(0)
         Utils.write_s8(value.to_i) << Utils.write_s4(value.nsec)
@@ -32,6 +42,11 @@ module ZeroFormatter
     module TimeWithOffsetSerializer
       extend self
       Alias = %i(datetime_with_offset time_with_offset)
+
+      def bytesize
+        14
+      end
+
       def serialize(value)
         value ||= {time: Time.at(0), time_offset: 0}
         Utils.write_s8(value[:time].to_i + value[:time_offset]*60) << Utils.write_s4(value[:time].nsec) << Utils.write_s2(value[:time_offset])

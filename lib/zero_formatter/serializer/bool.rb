@@ -3,6 +3,11 @@ module ZeroFormatter
     module BoolSerializer
       extend self
       Alias = %i(bool boolean)
+
+      def bytesize
+        1
+      end
+
       def serialize(value)
         Utils.write_u1(value ? 1 : 0)
       end

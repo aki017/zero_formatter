@@ -3,6 +3,11 @@ module ZeroFormatter
     module ObjectSerializer
       extend self
       Alias = %i(object)
+
+      def bytesize
+        -1
+      end
+
       def serialize(value)
         ZeroFormatter.dump(value)
       end
